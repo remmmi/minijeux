@@ -40,13 +40,14 @@
 
         .color-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
             margin-bottom: 30px;
         }
 
         .color-btn {
-            padding: 25px;
+            width: 100%;
+            aspect-ratio: 1;
             border: none;
             border-radius: 15px;
             font-size: 16px;
@@ -57,6 +58,9 @@
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .color-btn:hover {
@@ -296,6 +300,183 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
         }
+
+        /* Responsive pour tablettes */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .color-btn {
+                font-size: 0.9em;
+            }
+        }
+
+        /* Petits smartphones */
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+                margin-bottom: 15px;
+            }
+
+            .hint {
+                font-size: 0.8em;
+                margin-bottom: 20px;
+            }
+
+            .sequence-display {
+                padding: 15px 10px;
+                min-height: 60px;
+                margin-bottom: 20px;
+            }
+
+            .color-grid {
+                gap: 8px;
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .color-btn {
+                font-size: 0.75em;
+            }
+
+            .selected-color {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 20px;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+
+            .modal-content {
+                padding: 20px 15px;
+                width: 95%;
+                max-height: 90vh;
+            }
+
+            .modal-header h2 {
+                font-size: 1.5em;
+            }
+
+            .modal-body {
+                font-size: 0.9em;
+            }
+
+            .modal-body h3 {
+                font-size: 1.2em;
+            }
+
+            .modal-body > div[style*="display: flex"] {
+                flex-wrap: wrap;
+                gap: 5px !important;
+            }
+
+            .modal-body > div[style*="display: flex"] > div {
+                padding: 8px 12px !important;
+                font-size: 0.85em !important;
+            }
+
+            .close-btn {
+                font-size: 1.5em;
+                top: 10px;
+                right: 15px;
+            }
+        }
+
+        /* Très petits smartphones */
+        @media (max-width: 375px) {
+            h1 {
+                font-size: 1.3em;
+            }
+
+            .color-grid {
+                gap: 6px;
+            }
+
+            .color-btn {
+                font-size: 0.7em;
+            }
+
+            .modal-content {
+                padding: 15px 10px;
+                width: 98%;
+            }
+
+            .modal-header h2 {
+                font-size: 1.3em;
+            }
+
+            .modal-body {
+                font-size: 0.85em;
+            }
+
+            .modal-body h3 {
+                font-size: 1.1em;
+            }
+
+            .close-btn {
+                font-size: 1.3em;
+            }
+        }
+
+        /* Orientation paysage sur smartphone */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                min-height: auto;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.2em;
+                margin-bottom: 10px;
+            }
+
+            .hint {
+                margin-bottom: 10px;
+            }
+
+            .sequence-display {
+                min-height: 50px;
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+
+            .color-btn {
+                font-size: 0.7em;
+            }
+
+            .controls {
+                margin-top: 10px;
+            }
+
+            .modal-content {
+                padding: 15px;
+                max-height: 95vh;
+            }
+
+            .modal-header h2 {
+                font-size: 1.3em;
+            }
+
+            .modal-body {
+                font-size: 0.85em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -361,15 +542,36 @@
             // Titre et contenu du modal de succès
             modalTitle: '🎉 DÉVERROUILLÉ ! 🎉',
             modalContent: `
-                <p style="text-align: center; font-size: 18px;">
-                    <strong>Félicitations!</strong> Vous avez trouvé la bonne séquence de couleurs!
-                </p>
-                <p style="text-align: center;">
-                    Le cadenas est maintenant déverrouillé.
-                </p>
+                <div style="text-align: center;">
+                    <h3 style="color: #00ffff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);">
+                        🎨 Séquence déverrouillée!
+                    </h3>
+
+                    <p style="font-size: 18px; margin: 20px 0;">
+                        <strong>Félicitations!</strong> Vous avez trouvé la bonne séquence de couleurs:
+                    </p>
+
+                    <div style="display: flex; gap: 10px; justify-content: center; margin: 20px 0;">
+                        <div style="background: linear-gradient(135deg, #3498db, #2874a6); padding: 10px 20px; border-radius: 8px; color: white; font-weight: bold;">Bleu</div>
+                        <div style="background: linear-gradient(135deg, #f1c40f, #d4ac0d); padding: 10px 20px; border-radius: 8px; color: white; font-weight: bold;">Jaune</div>
+                        <div style="background: linear-gradient(135deg, #27ae60, #229954); padding: 10px 20px; border-radius: 8px; color: white; font-weight: bold;">Vert</div>
+                        <div style="background: linear-gradient(135deg, #e74c3c, #c0392b); padding: 10px 20px; border-radius: 8px; color: white; font-weight: bold;">Rouge</div>
+                    </div>
+
+                    <p style="margin-top: 30px; color: rgba(255, 255, 255, 0.7);">
+                        Le cadenas est maintenant déverrouillé!
+                    </p>
+
+                    <div style="background: rgba(0, 255, 255, 0.1); padding: 20px; border-radius: 10px; margin: 30px 0; border-left: 4px solid rgba(0, 255, 255, 0.5);">
+                        <p style="font-size: 16px; color: rgba(255, 255, 255, 0.8); font-style: italic;">
+                            💡 <strong>Indice pour la suite:</strong><br>
+                            Mon identifiant snapchat est ma date de naissance + 3 jours
+                        </p>
+                    </div>
+                </div>
             `,
-            // Décommentez la ligne ci-dessous pour charger le contenu depuis un fichier externe:
-            modalContentFile: 'modal.html',
+            // modalContentFile désactivé (évite erreur CORS en file://)
+            // modalContentFile: 'modal.html',
         };
 
         // ============================================

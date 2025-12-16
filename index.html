@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadenas - Collection de Mini-Jeux</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 48px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+            color: #00ffff;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 1px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .game-card {
+            background: rgba(40, 40, 60, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .game-card:hover::before {
+            left: 100%;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(0, 255, 255, 0.6);
+            box-shadow: 0 15px 40px rgba(0, 255, 255, 0.3);
+        }
+
+        .game-icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+        }
+
+        .game-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+        }
+
+        .game-description {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .game-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-locked {
+            background: rgba(255, 100, 100, 0.2);
+            color: #ff6464;
+            border: 1px solid rgba(255, 100, 100, 0.4);
+        }
+
+        .status-available {
+            background: rgba(0, 255, 100, 0.2);
+            color: #00ff64;
+            border: 1px solid rgba(0, 255, 100, 0.4);
+        }
+
+        .game-number {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 255, 255, 0.2);
+            border: 2px solid rgba(0, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #00ffff;
+            font-size: 18px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+            }
+            to {
+                text-shadow: 0 0 40px rgba(0, 255, 255, 0.8);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 36px;
+                margin-bottom: 15px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+                margin-bottom: 30px;
+            }
+
+            .games-grid {
+                gap: 20px;
+                grid-template-columns: 1fr;
+            }
+
+            .game-card {
+                padding: 25px;
+            }
+
+            .game-icon {
+                font-size: 40px;
+            }
+
+            .game-title {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 28px;
+            }
+
+            .subtitle {
+                font-size: 14px;
+            }
+
+            .game-card {
+                padding: 20px;
+            }
+
+            .game-icon {
+                font-size: 36px;
+                margin-bottom: 15px;
+            }
+
+            .game-title {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+
+            .game-description {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 CADENAS</h1>
+        <p class="subtitle">Collection de Mini-Jeux Interactifs</p>
+
+        <div class="games-grid">
+            <!-- Game 1: Cryptex -->
+            <a href="cryptex/index.html" class="game-card">
+                <div class="game-number">1</div>
+                <div class="game-icon">🔤</div>
+                <div class="game-title">Snapchat</div>
+                <div class="game-description">
+                    Faites tourner les roues du cryptex pour trouver le mot de passe secret.
+                </div>
+                <div style="text-align: center;">
+                    <span class="game-status status-available">Disponible</span>
+                </div>
+            </a>
+
+            <!-- Game 2: Couleurs -->
+            <a href="couleurs/index.html" class="game-card">
+                <div class="game-number">2</div>
+                <div class="game-icon">🎨</div>
+                <div class="game-title">Identifiant Snapchat</div>
+                <div class="game-description">
+                    Trouvez la séquence de couleurs correcte pour déverrouiller le cadenas.
+                </div>
+                <div style="text-align: center;">
+                    <span class="game-status status-available">Disponible</span>
+                </div>
+            </a>
+
+            <!-- Game 3: Clavnum -->
+            <a href="clavnum/index.html" class="game-card">
+                <div class="game-number">3</div>
+                <div class="game-icon">🔢</div>
+                <div class="game-title">Code de déverrouillage</div>
+                <div class="game-description">
+                    Entrez le bon code numérique sur le clavier pour ouvrir le cadenas.
+                </div>
+                <div style="text-align: center;">
+                    <span class="game-status status-available">Disponible</span>
+                </div>
+            </a>
+
+            <!-- Game 4: Piano -->
+            <a href="piano/index.html" class="game-card">
+                <div class="game-number">4</div>
+                <div class="game-icon">🎹</div>
+                <div class="game-title">Identifiant WhatsApp</div>
+                <div class="game-description">
+                    Jouez la mélodie correcte sur le piano pour révéler le secret.
+                </div>
+                <div style="text-align: center;">
+                    <span class="game-status status-available">Disponible</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>🎮 4 mini-jeux interactifs | Conçu avec HTML, CSS & JavaScript</p>
+        </div>
+    </div>
+</body>
+</html>

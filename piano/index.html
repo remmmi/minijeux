@@ -336,6 +336,10 @@
         }
 
         @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
             .key.white {
                 width: 45px;
                 height: 150px;
@@ -351,6 +355,156 @@
             .black-3 { left: 167px; }
             .black-4 { left: 212px; }
             .black-5 { left: 257px; }
+        }
+
+        /* Petits smartphones */
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+                margin-bottom: 15px;
+            }
+
+            .hint {
+                font-size: 0.8em;
+                margin-bottom: 20px;
+            }
+
+            .sequence-display {
+                padding: 15px 10px;
+                min-height: 60px;
+                margin-bottom: 20px;
+            }
+
+            .sequence-display p {
+                font-size: 0.85em;
+            }
+
+            .note-bubble {
+                padding: 6px 12px;
+                font-size: 0.95em;
+            }
+
+            .key.white {
+                width: 38px;
+                height: 130px;
+                font-size: 0.75em;
+                padding-bottom: 10px;
+            }
+
+            .key.black {
+                width: 25px;
+                height: 85px;
+                font-size: 0.65em;
+                padding-bottom: 8px;
+            }
+
+            .black-1 { left: 27px; }
+            .black-2 { left: 65px; }
+            .black-3 { left: 141px; }
+            .black-4 { left: 179px; }
+            .black-5 { left: 217px; }
+
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 20px;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+
+            .modal-content {
+                padding: 30px 20px;
+                width: 95%;
+            }
+
+            .modal-header h2 {
+                font-size: 2em;
+            }
+
+            .modal-body {
+                font-size: 1em;
+            }
+
+            #unlockAudioBtn {
+                padding: 15px 30px;
+                font-size: 1.2em;
+            }
+        }
+
+        /* Très petits smartphones */
+        @media (max-width: 375px) {
+            h1 {
+                font-size: 1.3em;
+            }
+
+            .key.white {
+                width: 35px;
+                height: 120px;
+                font-size: 0.7em;
+            }
+
+            .key.black {
+                width: 23px;
+                height: 78px;
+                font-size: 0.6em;
+            }
+
+            .black-1 { left: 25px; }
+            .black-2 { left: 60px; }
+            .black-3 { left: 130px; }
+            .black-4 { left: 165px; }
+            .black-5 { left: 200px; }
+
+            .note-bubble {
+                padding: 5px 10px;
+                font-size: 0.9em;
+            }
+        }
+
+        /* Orientation paysage sur smartphone */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                min-height: auto;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.2em;
+                margin-bottom: 10px;
+            }
+
+            .hint {
+                margin-bottom: 10px;
+            }
+
+            .sequence-display {
+                min-height: 50px;
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+
+            .key.white {
+                height: 100px;
+            }
+
+            .key.black {
+                height: 65px;
+            }
+
+            .controls {
+                margin-top: 15px;
+            }
         }
     </style>
 </head>

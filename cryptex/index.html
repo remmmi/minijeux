@@ -262,6 +262,163 @@
             transform: scale(1.2);
             color: #00ff00;
         }
+
+        /* Responsive pour tablettes */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .cryptex {
+                transform: scale(0.9);
+            }
+        }
+
+        /* Petits smartphones */
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+                margin-bottom: 15px;
+            }
+
+            .hint {
+                font-size: 0.8em;
+                margin-bottom: 20px;
+            }
+
+            .cryptex {
+                transform: scale(0.75);
+                margin-bottom: 20px;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 20px;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+
+            .modal-content {
+                padding: 20px 15px;
+                width: 95%;
+                max-height: 90vh;
+            }
+
+            .modal-header h2 {
+                font-size: 1.5em;
+            }
+
+            .modal-body {
+                font-size: 0.9em;
+            }
+
+            .modal-body h3 {
+                font-size: 1.2em;
+            }
+
+            .modal-body p {
+                font-size: 0.9em;
+            }
+
+            .modal-body audio {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .close-btn {
+                font-size: 1.5em;
+                top: 10px;
+                right: 15px;
+            }
+        }
+
+        /* Très petits smartphones */
+        @media (max-width: 375px) {
+            h1 {
+                font-size: 1.3em;
+            }
+
+            .cryptex {
+                transform: scale(0.65);
+            }
+
+            .btn {
+                padding: 10px 15px;
+                font-size: 0.95em;
+            }
+
+            .modal-content {
+                padding: 15px 10px;
+                width: 98%;
+            }
+
+            .modal-header h2 {
+                font-size: 1.3em;
+            }
+
+            .modal-body {
+                font-size: 0.85em;
+            }
+
+            .modal-body h3 {
+                font-size: 1.1em;
+            }
+
+            .close-btn {
+                font-size: 1.3em;
+            }
+        }
+
+        /* Orientation paysage sur smartphone */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                min-height: auto;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.2em;
+                margin-bottom: 10px;
+            }
+
+            .hint {
+                margin-bottom: 10px;
+            }
+
+            .cryptex {
+                transform: scale(0.6);
+                margin-bottom: 10px;
+            }
+
+            .controls {
+                margin-top: 10px;
+            }
+
+            .modal-content {
+                padding: 15px;
+                max-height: 95vh;
+            }
+
+            .modal-header h2 {
+                font-size: 1.3em;
+            }
+
+            .modal-body {
+                font-size: 0.85em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -298,15 +455,33 @@
             password: 'CYBER',
 
             // Contenu de la modale (HTML)
-            // Option 1: Contenu inline (texte/HTML directement)
             modalContent: `
-                <p>Félicitations ! Vous avez déverrouillé le cryptex !</p>
-                <p>Voici votre indice pour la suite...</p>
+                <h3>🎯 Bravo, vous avez réussi !</h3>
+
+                <p>Vous avez déverrouillé le cryptex avec succès.</p>
+
+                <p>Voici votre indice pour la suite de l'aventure :</p>
+
+                <div style="background: rgba(0,255,255,0.1); padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid rgba(0, 255, 255, 0.5);">
+                    <p style="font-size: 1.1em; margin-bottom: 15px;">
+                        💡 <strong>Indice audio:</strong>
+                    </p>
+                    <audio controls style="width: 100%; margin: 10px 0;">
+                        <source src="indice.mp3" type="audio/mpeg">
+                        Votre navigateur ne supporte pas l'élément audio.
+                    </audio>
+                    <p style="font-size: 0.9em; color: rgba(255, 255, 255, 0.6); margin-top: 10px;">
+                        Écoutez attentivement l'indice...
+                    </p>
+                </div>
+
+                <p style="margin-top: 30px; font-size: 0.9em; opacity: 0.7;">
+                    Bonne chance pour la suite ! 🚀
+                </p>
             `,
 
-            // Option 2: Charger depuis un fichier externe
-            // Décommentez la ligne ci-dessous et commentez modalContent pour utiliser un fichier
-            modalContentFile: 'modal.html',
+            // modalContentFile désactivé (évite erreur CORS en file://)
+            // modalContentFile: 'modal.html',
 
             // Titre de la modale
             modalTitle: '🎉 DÉVERROUILLÉ ! 🎉',
