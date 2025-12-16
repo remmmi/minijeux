@@ -266,7 +266,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔐 CRYPTEX</h1>
+        <h1>Snapchat</h1>
         <p class="hint">Utilisez les flèches pour trouver le code secret...</p>
 
         <div class="cryptex" id="cryptex"></div>
@@ -291,6 +291,9 @@
         // ============================================================
 
         const CONFIG = {
+            // Titre du jeu (affiché en haut de la page)
+            gameTitle: 'Snapchat',
+
             // Combinaison secrète à trouver
             password: 'CYBER',
 
@@ -303,7 +306,7 @@
 
             // Option 2: Charger depuis un fichier externe
             // Décommentez la ligne ci-dessous et commentez modalContent pour utiliser un fichier
-            // modalContentFile: 'modal.html',
+            modalContentFile: 'modal.html',
 
             // Titre de la modale
             modalTitle: '🎉 DÉVERROUILLÉ ! 🎉',
@@ -584,6 +587,9 @@
 
         // Initialisation
         async function init() {
+            // Mettre à jour le titre du jeu
+            document.querySelector('h1').textContent = CONFIG.gameTitle;
+
             await loadModalContent();
             createCryptex();
         }

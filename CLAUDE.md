@@ -6,6 +6,156 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 "Cadenas" is a collection of 4 interactive mini-games built with vanilla HTML/CSS/JavaScript. Each game is self-contained in its own directory with an `index.html` file.
 
+## ⚠️ CONVENTIONS IMPORTANTES
+
+### Structure Normalisée (OBLIGATOIRE)
+
+Tous les jeux DOIVENT suivre cette structure exacte:
+
+#### 1. CONFIG Centralisé
+
+**TOUJOURS placer en haut du `<script>`:**
+
+```javascript
+const CONFIG = {
+    // Titre du jeu (affiché en haut de la page) - OBLIGATOIRE
+    gameTitle: 'Titre du Jeu',
+
+    // Solution du jeu - OBLIGATOIRE
+    password: 'SOLUTION',  // ou correctSequence, correctCode, correctMelody
+
+    // Modal - OBLIGATOIRE
+    modalTitle: '🎉 DÉVERROUILLÉ ! 🎉',
+    modalContentFile: 'modal.html',  // TOUJOURS activé par défaut
+
+    // Paramètres spécifiques au jeu - OPTIONNEL
+    // ...
+};
+```
+
+#### 2. Fonction init() - OBLIGATOIRE
+
+**TOUJOURS inclure cette ligne au début de init():**
+
+```javascript
+async function init() {
+    // Mettre à jour le titre du jeu - OBLIGATOIRE
+    document.querySelector('h1').textContent = CONFIG.gameTitle;
+
+    await loadModalContent();
+    // ... reste de l'initialisation
+}
+```
+
+#### 3. Fichier modal.html - OBLIGATOIRE
+
+Chaque jeu DOIT avoir un `modal.html` avec:
+- Contenu de réussite
+- Indice pour le jeu suivant
+- Support pour audio/vidéo/images si nécessaire
+
+#### 4. HTML Structure - OBLIGATOIRE
+
+```html
+<body>
+    <div class="container">
+        <h1>Titre Initial</h1>
+        <!-- Le titre sera remplacé par CONFIG.gameTitle au chargement -->
+
+        <!-- Contenu du jeu -->
+    </div>
+
+    <!-- Modal (structure standard) -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIG ici
+        // Code du jeu
+        // init() avec mise à jour du titre
+    </script>
+</body>
+```
+
+### Conventions de Nommage
+
+| Élément | Convention | Exemple |
+|---------|-----------|---------|
+| **Titre de jeu** | `gameTitle` dans CONFIG | `gameTitle: 'Snapchat'` |
+| **Solution** | Nom spécifique au type | `password`, `correctSequence`, `correctCode`, `correctMelody` |
+| **Modal externe** | Toujours `modal.html` | `modalContentFile: 'modal.html'` |
+| **Fonction init** | Toujours `async function init()` | Avec mise à jour titre en premier |
+
+### Chaîne des Jeux (Ne PAS modifier sans raison)
+
+```
+1. Cryptex (gameTitle: "Snapchat") → password: "CYBER"
+   └─> Indice: Audio (indice.mp3)
+
+2. Couleurs (gameTitle: "Identifiant Snapchat") → ['Bleu', 'Jaune', 'Vert', 'Rouge']
+   └─> Indice: "Mon identifiant snapchat est ma date de naissance + 3 jours"
+
+3. Clavnum (gameTitle: "Code de déverrouillage :") → code: "0809"
+   └─> Indice: "Jouez 'Au clair de la lune' sur le piano..."
+
+4. Piano (gameTitle: "Identifiant WhatsApp") → melody: Do-Do-Do-Ré-Mi-Ré-Do-Mi-Ré-Ré-Do
+   └─> Indice: "Mon code WhatsApp est 3080"
+```
+
+### Style Visuel - NE PAS DÉVIER
+
+**Palette de couleurs obligatoire:**
+```css
+--bg-dark: #1a1a2e;      /* Background gradient start */
+--bg-medium: #16213e;     /* Background gradient end */
+--accent-cyan: #00ffff;   /* Primary accent */
+--accent-green: #00ff00;  /* Secondary accent (success) */
+```
+
+**Effets obligatoires:**
+- Text-shadow avec glow cyan sur les titres
+- Border avec rgba(0, 255, 255, 0.3) pour les modaux
+- Animations smooth (0.2s-0.5s ease)
+
+### Modification du Projet
+
+#### ✅ CE QUI PEUT ÊTRE MODIFIÉ FACILEMENT:
+- `CONFIG.gameTitle` - Titre du jeu
+- `CONFIG.password` / `correctSequence` / etc. - Solution
+- Contenu des fichiers `modal.html` - Indices/récompenses
+- `CONFIG.modalTitle` - Titre du modal
+
+#### ⚠️ CE QUI NE DOIT PAS ÊTRE MODIFIÉ:
+- Structure du CONFIG (ordre, présence de gameTitle)
+- Fonction init() sans mise à jour du titre
+- Nom du fichier `modal.html`
+- Structure HTML du modal
+- Palette de couleurs principale
+
+#### 🚫 CE QUI EST INTERDIT:
+- Supprimer `CONFIG.gameTitle`
+- Ne pas mettre à jour le h1 dans init()
+- Désactiver `modalContentFile` par défaut
+- Changer les noms de variables du CONFIG
+- Ajouter des dépendances externes
+
+### Vérification de Conformité
+
+Avant de valider une modification, vérifier:
+1. ✅ Le CONFIG contient `gameTitle` en premier
+2. ✅ `modalContentFile: 'modal.html'` est activé
+3. ✅ `init()` met à jour `document.querySelector('h1').textContent`
+4. ✅ Le fichier `modal.html` existe avec un indice
+5. ✅ Le style utilise les couleurs cyan/green
+6. ✅ Aucune dépendance externe ajoutée
+
 ## Project Structure
 
 ```
@@ -29,6 +179,58 @@ Each game is standalone and can be opened directly in a browser:
 xdg-open cryptex/index.html
 
 # Or simply open the HTML files in any browser
+```
+
+## Quick Configuration Guide
+
+All games are normalized with a centralized CONFIG object for easy customization. You can quickly change titles, hints, passwords, and modal content without touching the game logic.
+
+### Changing Game Title
+
+In each game's `index.html`, modify the `gameTitle` in the CONFIG object:
+
+```javascript
+const CONFIG = {
+    gameTitle: 'Your Custom Title',  // ← Change this
+    // ... other settings
+};
+```
+
+The title will automatically update when the game loads.
+
+### Changing Hints/Rewards (Modal Content)
+
+Each game has a `modal.html` file that displays content when the puzzle is solved. To change hints:
+
+1. **Edit the modal file** (`cryptex/modal.html`, `couleurs/modal.html`, etc.)
+2. **Supported content types:**
+   - Text and HTML
+   - Images: `<img src="indice.jpg">`
+   - Videos: `<video controls><source src="indice.mp4"></video>`
+   - Audio: `<audio controls><source src="indice.mp3"></audio>`
+   - YouTube embeds: `<iframe src="https://www.youtube.com/embed/..."></iframe>`
+
+3. **The modal file is automatically loaded** because `modalContentFile: 'modal.html'` is active in all games
+
+### Quick Reference
+
+| Game | Config Location | Modal File | Default Title |
+|------|----------------|------------|---------------|
+| **cryptex** | `cryptex/index.html` line ~293 | `cryptex/modal.html` | Snapchat |
+| **couleurs** | `couleurs/index.html` line ~354 | `couleurs/modal.html` | Identifiant Snapchat |
+| **clavnum** | `clavnum/index.html` line ~351 | `clavnum/modal.html` | Code de déverrouillage : |
+| **piano** | `piano/index.html` line ~411 | `piano/modal.html` | Identifiant WhatsApp |
+
+### Example: Adding an Audio Hint
+
+Edit the modal.html file:
+```html
+<div style="padding: 20px;">
+    <p>💡 <strong>Indice audio:</strong></p>
+    <audio controls style="width: 100%;">
+        <source src="indice.mp3" type="audio/mpeg">
+    </audio>
+</div>
 ```
 
 ## Development Guidelines

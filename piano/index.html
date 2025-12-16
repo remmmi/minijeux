@@ -356,7 +356,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎹 PIANO</h1>
+        <h1>Identifiant WhatsApp</h1>
         <p class="hint">Jouez la mélodie sur le piano...</p>
 
         <div class="sequence-display" id="sequenceDisplay">
@@ -409,6 +409,9 @@
         // ============================================================
 
         const CONFIG = {
+            // Titre du jeu (affiché en haut de la page)
+            gameTitle: 'Identifiant WhatsApp',
+
             // Mélodie à jouer (première phrase de "Au clair de la lune")
             correctMelody: ['Do', 'Do', 'Do', 'Ré', 'Mi', 'Ré', 'Do', 'Mi', 'Ré', 'Ré', 'Do'],
 
@@ -425,7 +428,7 @@
 
             // Option : Charger depuis un fichier externe
             // Décommentez la ligne ci-dessous et commentez modalContent pour utiliser un fichier
-            // modalContentFile: 'modal.html',
+            modalContentFile: 'modal.html',
 
             // Afficher la solution dans l'indice
             showHint: false,  // true pour afficher la solution
@@ -759,6 +762,9 @@
 
         // Initialisation
         async function init() {
+            // Mettre à jour le titre du jeu
+            document.querySelector('h1').textContent = CONFIG.gameTitle;
+
             await loadModalContent();
             initPiano();
         }

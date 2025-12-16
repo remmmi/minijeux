@@ -300,7 +300,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Code de déverrouillage :</h1>
+        <h1>Identifiant Snapchat</h1>
 
         <div class="sequence-display">
             <div class="sequence-title">Séquence sélectionnée :</div>
@@ -352,6 +352,9 @@
         // CONFIGURATION
         // ============================================
         const CONFIG = {
+            // Titre du jeu (affiché en haut de la page)
+            gameTitle: 'Identifiant Snapchat',
+
             // La séquence de couleurs correcte (facile à modifier!)
             correctSequence: ['Bleu', 'Jaune', 'Vert', 'Rouge'],
 
@@ -366,7 +369,7 @@
                 </p>
             `,
             // Décommentez la ligne ci-dessous pour charger le contenu depuis un fichier externe:
-            // modalContentFile: 'modal.html',
+            modalContentFile: 'modal.html',
         };
 
         // ============================================
@@ -508,6 +511,9 @@
         // INITIALIZATION
         // ============================================
         async function init() {
+            // Mettre à jour le titre du jeu
+            document.querySelector('h1').textContent = CONFIG.gameTitle;
+
             await loadModalContent();
         }
 

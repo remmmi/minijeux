@@ -349,6 +349,9 @@
         // CONFIGURATION
         // ============================================
         const CONFIG = {
+            // Titre du jeu (affiché en haut de la page)
+            gameTitle: 'Code de déverrouillage :',
+
             // Le code numérique correct (facile à modifier!)
             correctCode: '0809',
 
@@ -369,7 +372,7 @@
                 </p>
             `,
             // Décommentez la ligne ci-dessous pour charger le contenu depuis un fichier externe:
-            // modalContentFile: 'modal.html',
+            modalContentFile: 'modal.html',
         };
 
         // ============================================
@@ -522,6 +525,9 @@
         // INITIALIZATION
         // ============================================
         async function init() {
+            // Mettre à jour le titre du jeu
+            document.querySelector('h1').textContent = CONFIG.gameTitle;
+
             await loadModalContent();
             updateDisplay();
         }
