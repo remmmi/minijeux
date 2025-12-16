@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clavier Numérique - Mini Jeu</title>
+    <meta name="description" content="Mini-jeu de puzzle interactif - Trouvez le code secret pour déverrouiller le cadenas. Jeu éducatif et amusant.">
+    <meta name="keywords" content="jeu, puzzle, mini-jeu, énigme, cadenas, divertissement">
+    <meta name="author" content="Collection Cadenas - Mini-Jeux">
+    <meta name="robots" content="index, follow">
+    <title>Puzzle Cadenas Numérique - Mini Jeu Interactif</title>
     <style>
         /* Reset */
         * {
@@ -39,6 +43,23 @@
             font-size: 24px;
             letter-spacing: 2px;
             text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .game-info {
+            background: rgba(0, 255, 255, 0.1);
+            border-left: 4px solid rgba(0, 255, 255, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .game-info strong {
+            color: #00ffff;
+            display: block;
+            margin-bottom: 5px;
         }
 
         /* Display area */
@@ -284,6 +305,16 @@
                 padding: 30px 20px;
             }
 
+            h1 {
+                font-size: 1.3em;
+            }
+
+            .game-info {
+                font-size: 0.85em;
+                padding: 12px;
+                margin-bottom: 20px;
+            }
+
             .key {
                 padding: 20px;
                 font-size: 28px;
@@ -298,7 +329,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>Code de déverrouillage :</h1>
+        <h1>🎮 Puzzle du Cadenas Numérique</h1>
+
+        <div class="game-info">
+            <strong>🎯 Comment jouer :</strong>
+            Ceci est un mini-jeu de puzzle. Trouvez le code secret à 4 chiffres pour déverrouiller le cadenas virtuel et découvrir l'indice suivant !
+        </div>
 
         <div class="display">
             <div class="display-content" id="display">
@@ -350,7 +386,7 @@
         // ============================================
         const CONFIG = {
             // Titre du jeu (affiché en haut de la page)
-            gameTitle: 'Code de déverrouillage :',
+            gameTitle: '🎮 Puzzle du Cadenas Numérique',
 
             // Le code numérique correct (facile à modifier!)
             correctCode: '0809',
