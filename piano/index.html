@@ -359,6 +359,13 @@
         <h1>Identifiant WhatsApp</h1>
         <p class="hint">Jouez la mélodie sur le piano...</p>
 
+        <!-- Overlay pour activer le son -->
+        <div id="audioUnlockOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+            <button id="unlockAudioBtn" style="padding: 20px 40px; font-size: 1.5em; background: linear-gradient(135deg, #00ffff, #00ff00); border: none; border-radius: 15px; color: #000; font-weight: bold; cursor: pointer; box-shadow: 0 0 30px rgba(0,255,255,0.5); transition: all 0.3s;">
+                🔊 Activer le son
+            </button>
+        </div>
+
         <div class="sequence-display" id="sequenceDisplay">
             <p>Séquence de déverrouillage : (cliquez sur les touches)</p>
         </div>
@@ -420,15 +427,33 @@
 
             // Contenu de la modale (HTML)
             modalContent: `
-                <p>Félicitations ! Vous avez joué la mélodie correctement !</p>
-                <p style="margin-top: 20px; font-style: italic; color: rgba(255,255,255,0.8);">
-                    "Au clair de la lune, mon ami Pierrot..."
+                <h3>🎵 Bravo, musicien ! 🎵</h3>
+
+                <p>Vous avez parfaitement joué la mélodie de <strong>"Au clair de la lune"</strong> !</p>
+
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center;">
+                    <p style="font-size: 1.3em; font-style: italic; color: #00ffff; line-height: 1.8;">
+                        🎼 Do - Do - Do - Ré - Mi - Ré - Do - Mi - Ré - Ré - Do 🎼
+                    </p>
+                    <p style="margin-top: 15px; font-size: 0.95em; opacity: 0.8;">
+                        "Au clair de la lune, mon ami Pierrot..."
+                    </p>
+                </div>
+
+                <p>Cette célèbre comptine française date du 18ème siècle et est parfaite pour apprendre le piano !</p>
+
+                <div style="margin-top: 30px; padding: 15px; background: rgba(0,255,100,0.1); border-left: 4px solid #00ff64; border-radius: 5px;">
+                    <h4 style="color: #00ff64; margin-bottom: 10px;">💡 Indice pour la suite</h4>
+                    <p style="font-size: 1.1em; font-style: italic;">Mon code WhatsApp est <strong style="color: #00ff64;">3080</strong></p>
+                </div>
+
+                <p style="margin-top: 30px; font-size: 0.9em; opacity: 0.7;">
+                    Continue ton aventure ! 🚀
                 </p>
             `,
 
-            // Option : Charger depuis un fichier externe
-            // Décommentez la ligne ci-dessous et commentez modalContent pour utiliser un fichier
-            modalContentFile: 'modal.html',
+            // Option : Charger depuis un fichier externe (désactivé car erreur CORS avec file://)
+            // modalContentFile: 'modal.html',
 
             // Afficher la solution dans l'indice
             showHint: false,  // true pour afficher la solution
@@ -462,24 +487,51 @@
             'Do2': 523.25   // C5
         };
 
-        // Initialiser le contexte audio
-        function initAudio() {
+        // Fonction pour débloquer l'audio avec le bouton
+        function unlockAudio() {
             if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
             }
+
+            // Créer et jouer un buffer silencieux pour débloquer complètement le contexte
+            const buffer = audioContext.createBuffer(1, 1, 22050);
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioContext.destination);
+            source.start(0);
+
+            // Résumer le contexte
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
+            // Cacher l'overlay
+            document.getElementById('audioUnlockOverlay').style.display = 'none';
         }
+
+        // Attacher l'événement au bouton
+        document.getElementById('unlockAudioBtn').addEventListener('click', unlockAudio);
 
         // Jouer un son de piano amélioré avec Web Audio API
         // Utilise plusieurs oscillateurs pour un son plus riche
         function playSound(note) {
             if (!CONFIG.soundEnabled) return;
 
-            initAudio();
+            // Initialiser le contexte si nécessaire (normalement déjà fait par le bouton)
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            // Résumer si nécessaire
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
 
             const frequency = noteFrequencies[note];
             if (!frequency) return;
 
-            const now = audioContext.currentTime;
+            // Le contexte est maintenant débloqué, jouer normalement
+            const startTime = audioContext.currentTime;
             const duration = 1.2;
 
             // Créer plusieurs oscillateurs pour un son plus riche (harmoniques)
@@ -490,41 +542,41 @@
             const osc1 = audioContext.createOscillator();
             const gain1 = audioContext.createGain();
             osc1.type = 'sine';
-            osc1.frequency.setValueAtTime(frequency, now);
+            osc1.frequency.setValueAtTime(frequency, startTime);
 
             // Harmonique 2 (octave supérieure, plus faible)
             const osc2 = audioContext.createOscillator();
             const gain2 = audioContext.createGain();
             osc2.type = 'sine';
-            osc2.frequency.setValueAtTime(frequency * 2, now);
+            osc2.frequency.setValueAtTime(frequency * 2, startTime);
 
             // Harmonique 3 (quinte, encore plus faible)
             const osc3 = audioContext.createOscillator();
             const gain3 = audioContext.createGain();
             osc3.type = 'triangle';
-            osc3.frequency.setValueAtTime(frequency * 3, now);
+            osc3.frequency.setValueAtTime(frequency * 3, startTime);
 
             // Enveloppe ADSR pour chaque oscillateur (Attack, Decay, Sustain, Release)
             // Oscillateur principal
-            gain1.gain.setValueAtTime(0, now);
-            gain1.gain.linearRampToValueAtTime(0.3, now + 0.005);   // Attack très rapide
-            gain1.gain.exponentialRampToValueAtTime(0.2, now + 0.1); // Decay
-            gain1.gain.exponentialRampToValueAtTime(0.05, now + 0.8); // Sustain
-            gain1.gain.linearRampToValueAtTime(0.001, now + duration); // Release
+            gain1.gain.setValueAtTime(0, startTime);
+            gain1.gain.linearRampToValueAtTime(0.3, startTime + 0.005);   // Attack très rapide
+            gain1.gain.exponentialRampToValueAtTime(0.2, startTime + 0.1); // Decay
+            gain1.gain.exponentialRampToValueAtTime(0.05, startTime + 0.8); // Sustain
+            gain1.gain.linearRampToValueAtTime(0.001, startTime + duration); // Release
 
             // Harmonique 2 (plus subtile)
-            gain2.gain.setValueAtTime(0, now);
-            gain2.gain.linearRampToValueAtTime(0.15, now + 0.005);
-            gain2.gain.exponentialRampToValueAtTime(0.1, now + 0.1);
-            gain2.gain.exponentialRampToValueAtTime(0.02, now + 0.6);
-            gain2.gain.linearRampToValueAtTime(0.001, now + duration);
+            gain2.gain.setValueAtTime(0, startTime);
+            gain2.gain.linearRampToValueAtTime(0.15, startTime + 0.005);
+            gain2.gain.exponentialRampToValueAtTime(0.1, startTime + 0.1);
+            gain2.gain.exponentialRampToValueAtTime(0.02, startTime + 0.6);
+            gain2.gain.linearRampToValueAtTime(0.001, startTime + duration);
 
             // Harmonique 3 (très subtile)
-            gain3.gain.setValueAtTime(0, now);
-            gain3.gain.linearRampToValueAtTime(0.08, now + 0.005);
-            gain3.gain.exponentialRampToValueAtTime(0.04, now + 0.08);
-            gain3.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-            gain3.gain.linearRampToValueAtTime(0.001, now + duration);
+            gain3.gain.setValueAtTime(0, startTime);
+            gain3.gain.linearRampToValueAtTime(0.08, startTime + 0.005);
+            gain3.gain.exponentialRampToValueAtTime(0.04, startTime + 0.08);
+            gain3.gain.exponentialRampToValueAtTime(0.01, startTime + 0.4);
+            gain3.gain.linearRampToValueAtTime(0.001, startTime + duration);
 
             // Connecter les oscillateurs
             osc1.connect(gain1);
@@ -536,15 +588,15 @@
             osc3.connect(gain3);
             gain3.connect(audioContext.destination);
 
-            // Démarrer et arrêter les oscillateurs
-            osc1.start(now);
-            osc1.stop(now + duration);
+            // Démarrer et arrêter les oscillateurs avec startTime
+            osc1.start(startTime);
+            osc1.stop(startTime + duration);
 
-            osc2.start(now);
-            osc2.stop(now + duration);
+            osc2.start(startTime);
+            osc2.stop(startTime + duration);
 
-            osc3.start(now);
-            osc3.stop(now + duration);
+            osc3.start(startTime);
+            osc3.stop(startTime + duration);
         }
 
         // ============================================================
