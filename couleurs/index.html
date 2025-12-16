@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadenas Couleur</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+        }
+
+        .container {
+            background: rgba(40, 40, 60, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .color-btn {
+            padding: 25px;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #fff;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .color-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .color-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .color-btn.selected {
+            box-shadow: 0 0 0 4px #fff, 0 0 20px rgba(255, 255, 255, 0.6);
+        }
+
+        .color-btn.red { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .color-btn.orange { background: linear-gradient(135deg, #f39c12, #d68910); }
+        .color-btn.yellow { background: linear-gradient(135deg, #f1c40f, #d4ac0d); }
+        .color-btn.green { background: linear-gradient(135deg, #27ae60, #229954); }
+        .color-btn.blue { background: linear-gradient(135deg, #3498db, #2874a6); }
+        .color-btn.purple { background: linear-gradient(135deg, #9b59b6, #7d3c98); }
+        .color-btn.indigo { background: linear-gradient(135deg, #3f51b5, #303f9f); }
+        .color-btn.pink { background: linear-gradient(135deg, #ff69b4, #e91e63); }
+        .color-btn.brown { background: linear-gradient(135deg, #8d6e63, #6d4c41); }
+        .color-btn.gray { background: linear-gradient(135deg, #95a5a6, #7f8c8d); }
+        .color-btn.black { background: linear-gradient(135deg, #2c2c2c, #000000); }
+        .color-btn.white {
+            background: linear-gradient(135deg, #ffffff, #ecf0f1);
+            color: #2c3e50;
+            text-shadow: none;
+        }
+
+        .sequence-display {
+            background: rgba(30, 30, 40, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            text-align: center;
+        }
+
+        .sequence-title {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+
+        .sequence-items {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .sequence-item {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .sequence-item.white {
+            color: #2c3e50;
+            text-shadow: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .control-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+        }
+
+        .validate-btn {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            display: none;
+        }
+
+        .message.success {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            display: block;
+        }
+
+        .message.error {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes unlock {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .unlock {
+            animation: unlock 0.6s;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.3);
+            animation: slideIn 0.5s ease;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 35px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            transform: rotate(90deg);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 32px;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+            color: #00ffff;
+        }
+
+        .modal-body {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.8;
+        }
+
+        .modal-body p {
+            margin-bottom: 15px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Code de déverrouillage :</h1>
+
+        <div class="sequence-display">
+            <div class="sequence-title">Séquence sélectionnée :</div>
+            <div class="sequence-items" id="sequenceDisplay"></div>
+        </div>
+
+        <div class="color-grid">
+            <button class="color-btn red" data-color="Rouge">Rouge</button>
+            <button class="color-btn orange" data-color="Orange">Orange</button>
+            <button class="color-btn yellow" data-color="Jaune">Jaune</button>
+            <button class="color-btn green" data-color="Vert">Vert</button>
+            <button class="color-btn blue" data-color="Bleu">Bleu</button>
+            <button class="color-btn purple" data-color="Violet">Violet</button>
+            <button class="color-btn indigo" data-color="Indigo">Indigo</button>
+            <button class="color-btn pink" data-color="Rose">Rose</button>
+            <button class="color-btn brown" data-color="Marron">Marron</button>
+            <button class="color-btn gray" data-color="Gris">Gris</button>
+            <button class="color-btn black" data-color="Noir">Noir</button>
+            <button class="color-btn white" data-color="Blanc">Blanc</button>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn reset-btn" id="resetBtn">
+                <span style="font-size: 24px;">↺</span>
+                Réinitialiser
+            </button>
+            <button class="control-btn validate-btn" id="validateBtn">
+                <span style="font-size: 24px;">✓</span>
+                Valider
+            </button>
+        </div>
+
+        <div class="message" id="message"></div>
+    </div>
+
+    <!-- Modal de succès -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalTitle">🎉 DÉVERROUILLÉ ! 🎉</h2>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const CONFIG = {
+            // La séquence de couleurs correcte (facile à modifier!)
+            correctSequence: ['Bleu', 'Jaune', 'Vert', 'Rouge'],
+
+            // Titre et contenu du modal de succès
+            modalTitle: '🎉 DÉVERROUILLÉ ! 🎉',
+            modalContent: `
+                <p style="text-align: center; font-size: 18px;">
+                    <strong>Félicitations!</strong> Vous avez trouvé la bonne séquence de couleurs!
+                </p>
+                <p style="text-align: center;">
+                    Le cadenas est maintenant déverrouillé.
+                </p>
+            `,
+            // Décommentez la ligne ci-dessous pour charger le contenu depuis un fichier externe:
+            // modalContentFile: 'modal.html',
+        };
+
+        // ============================================
+        // GAME CODE
+        // ============================================
+        let selectedSequence = [];
+
+        const colorButtons = document.querySelectorAll('.color-btn');
+        const sequenceDisplay = document.getElementById('sequenceDisplay');
+        const resetBtn = document.getElementById('resetBtn');
+        const validateBtn = document.getElementById('validateBtn');
+        const messageDiv = document.getElementById('message');
+        const container = document.querySelector('.container');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+
+        const colorClassMap = {
+            'Rouge': 'red',
+            'Orange': 'orange',
+            'Jaune': 'yellow',
+            'Vert': 'green',
+            'Bleu': 'blue',
+            'Violet': 'purple',
+            'Indigo': 'indigo',
+            'Rose': 'pink',
+            'Marron': 'brown',
+            'Gris': 'gray',
+            'Noir': 'black',
+            'Blanc': 'white'
+        };
+
+        // ============================================
+        // MODAL FUNCTIONS
+        // ============================================
+        async function loadModalContent() {
+            if (CONFIG.modalContentFile) {
+                try {
+                    const response = await fetch(CONFIG.modalContentFile);
+                    const content = await response.text();
+                    modalBody.innerHTML = content;
+                } catch (error) {
+                    console.warn('Impossible de charger le fichier modal, utilisation du contenu par défaut');
+                    modalBody.innerHTML = CONFIG.modalContent;
+                }
+            } else {
+                modalBody.innerHTML = CONFIG.modalContent;
+            }
+            modalTitle.textContent = CONFIG.modalTitle;
+        }
+
+        function showModal() {
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        // Fermer le modal en cliquant en dehors
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Fermer le modal avec la touche ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // ============================================
+        // GAME FUNCTIONS
+        // ============================================
+        function updateDisplay() {
+            sequenceDisplay.innerHTML = '';
+            selectedSequence.forEach(color => {
+                const item = document.createElement('div');
+                item.className = `sequence-item ${colorClassMap[color]}`;
+                item.textContent = color;
+                sequenceDisplay.appendChild(item);
+            });
+        }
+
+        colorButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const color = btn.dataset.color;
+                selectedSequence.push(color);
+                updateDisplay();
+
+                btn.classList.add('selected');
+                setTimeout(() => btn.classList.remove('selected'), 300);
+            });
+        });
+
+        resetBtn.addEventListener('click', () => {
+            selectedSequence = [];
+            updateDisplay();
+            messageDiv.style.display = 'none';
+            messageDiv.className = 'message';
+        });
+
+        validateBtn.addEventListener('click', () => {
+            if (selectedSequence.length === 0) {
+                showMessage('Veuillez sélectionner au moins une couleur.', 'error');
+                return;
+            }
+
+            if (arraysEqual(selectedSequence, CONFIG.correctSequence)) {
+                container.classList.add('unlock');
+                setTimeout(() => {
+                    container.classList.remove('unlock');
+                    showModal();
+                }, 600);
+            } else {
+                showMessage('❌ Code incorrect. Réessayez!', 'error');
+                container.classList.add('shake');
+                setTimeout(() => container.classList.remove('shake'), 500);
+            }
+        });
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+        }
+
+        function arraysEqual(arr1, arr2) {
+            if (arr1.length !== arr2.length) return false;
+            for (let i = 0; i < arr1.length; i++) {
+                if (arr1[i] !== arr2[i]) return false;
+            }
+            return true;
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        async function init() {
+            await loadModalContent();
+        }
+
+        init();
+    </script>
+</body>
+</html>

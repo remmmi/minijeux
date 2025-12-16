@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptex - Mini Jeu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .cryptex {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 40px 0;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .arrow {
+            width: 50px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .arrow:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
+
+        .arrow:active {
+            transform: scale(0.95);
+        }
+
+        .arrow-up::before {
+            content: '▲';
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .arrow-down::before {
+            content: '▼';
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .wheel {
+            width: 90px;
+            height: 300px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            cursor: grab;
+        }
+
+        .wheel:active {
+            cursor: grabbing;
+        }
+
+        /* Mask to show only center letter clearly */
+        .wheel::before,
+        .wheel::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 100px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .wheel::before {
+            top: 0;
+            background: linear-gradient(to bottom,
+                rgba(0, 0, 0, 0.8) 0%,
+                rgba(0, 0, 0, 0.5) 50%,
+                transparent 100%);
+        }
+
+        .wheel::after {
+            bottom: 0;
+            background: linear-gradient(to top,
+                rgba(0, 0, 0, 0.8) 0%,
+                rgba(0, 0, 0, 0.5) 50%,
+                transparent 100%);
+        }
+
+        .wheel-inner {
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease-out;
+            padding: 100px 0;
+        }
+
+        .letter {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #888;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .hint {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 3px solid #00ff00;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideDown 0.5s ease-out;
+            box-shadow: 0 0 50px rgba(0, 255, 0, 0.5);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            color: #00ff00;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .modal-body {
+            color: #fff;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .modal-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .modal-body video {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .modal-body iframe {
+            width: 100%;
+            height: 315px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2em;
+            color: #fff;
+            cursor: pointer;
+            background: none;
+            border: none;
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            opacity: 1;
+            transform: scale(1.2);
+            color: #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 CRYPTEX</h1>
+        <p class="hint">Utilisez les flèches pour trouver le code secret...</p>
+
+        <div class="cryptex" id="cryptex"></div>
+    </div>
+
+    <!-- Modal pour l'indice -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <h2>🎉 DÉVERROUILLÉ ! 🎉</h2>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Le contenu sera chargé depuis CONFIG.modalContent ou CONFIG.modalContentFile -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // CONFIGURATION - Modifiez ces paramètres selon vos besoins
+        // ============================================================
+
+        const CONFIG = {
+            // Combinaison secrète à trouver
+            password: 'CYBER',
+
+            // Contenu de la modale (HTML)
+            // Option 1: Contenu inline (texte/HTML directement)
+            modalContent: `
+                <p>Félicitations ! Vous avez déverrouillé le cryptex !</p>
+                <p>Voici votre indice pour la suite...</p>
+            `,
+
+            // Option 2: Charger depuis un fichier externe
+            // Décommentez la ligne ci-dessous et commentez modalContent pour utiliser un fichier
+            // modalContentFile: 'modal.html',
+
+            // Titre de la modale
+            modalTitle: '🎉 DÉVERROUILLÉ ! 🎉',
+
+            // Paramètres visuels
+            dragSensitivity: 1.5  // Sensibilité du drag (1.0 = normal, 2.0 = très sensible)
+        };
+
+        // ============================================================
+        // CODE DU JEU - Ne modifiez pas en dessous sauf si nécessaire
+        // ============================================================
+
+        const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+        const NUM_COLUMNS = CONFIG.password.length;
+        const LETTER_HEIGHT = 60;
+        const DRAG_SENSITIVITY = CONFIG.dragSensitivity;
+
+        let currentPositions = Array(NUM_COLUMNS).fill(0);
+        let isUnlocked = false;
+
+        // État du drag pour chaque colonne
+        let dragState = {
+            isDragging: false,
+            columnIndex: -1,
+            startY: 0,
+            currentOffset: 0,
+            startPosition: 0
+        };
+
+        function createCryptex() {
+            const cryptex = document.getElementById('cryptex');
+            cryptex.innerHTML = '';
+
+            for (let i = 0; i < NUM_COLUMNS; i++) {
+                const column = document.createElement('div');
+                column.className = 'column';
+
+                // Flèche haut
+                const arrowUp = document.createElement('div');
+                arrowUp.className = 'arrow arrow-up';
+                arrowUp.onclick = () => rotateWheel(i, -1);
+
+                // Roue
+                const wheel = document.createElement('div');
+                wheel.className = 'wheel';
+                wheel.dataset.columnIndex = i;
+
+                const wheelInner = document.createElement('div');
+                wheelInner.className = 'wheel-inner';
+                wheelInner.id = `wheel-inner-${i}`;
+
+                // Créer TOUTES les lettres de l'alphabet (3 fois pour le loop infini)
+                for (let repeat = 0; repeat < 3; repeat++) {
+                    ALPHABET.forEach(char => {
+                        const letter = document.createElement('div');
+                        letter.className = 'letter';
+                        letter.textContent = char;
+                        wheelInner.appendChild(letter);
+                    });
+                }
+
+                wheel.appendChild(wheelInner);
+
+                // Événements de drag sur la roue
+                wheel.addEventListener('mousedown', handleDragStart);
+                wheel.addEventListener('touchstart', handleDragStart, { passive: false });
+
+                // Flèche bas
+                const arrowDown = document.createElement('div');
+                arrowDown.className = 'arrow arrow-down';
+                arrowDown.onclick = () => rotateWheel(i, 1);
+
+                column.appendChild(arrowUp);
+                column.appendChild(wheel);
+                column.appendChild(arrowDown);
+
+                cryptex.appendChild(column);
+            }
+
+            // Événements globaux pour le drag
+            document.addEventListener('mousemove', handleDragMove);
+            document.addEventListener('mouseup', handleDragEnd);
+            document.addEventListener('touchmove', handleDragMove, { passive: false });
+            document.addEventListener('touchend', handleDragEnd);
+
+            updateAllWheels();
+        }
+
+        function handleDragStart(e) {
+            e.preventDefault();
+
+            const wheel = e.currentTarget;
+            const columnIndex = parseInt(wheel.dataset.columnIndex);
+
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+            dragState = {
+                isDragging: true,
+                columnIndex: columnIndex,
+                startY: clientY,
+                currentOffset: 0,
+                startPosition: currentPositions[columnIndex]
+            };
+
+            // Désactiver la transition pendant le drag
+            const wheelInner = document.getElementById(`wheel-inner-${columnIndex}`);
+            wheelInner.style.transition = 'none';
+        }
+
+        function handleDragMove(e) {
+            if (!dragState.isDragging) return;
+
+            e.preventDefault();
+
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+            const deltaY = (clientY - dragState.startY) * DRAG_SENSITIVITY;
+
+            dragState.currentOffset = deltaY;
+
+            // Calculer la position flottante (avec décimales)
+            const floatPosition = dragState.startPosition - (deltaY / LETTER_HEIGHT);
+
+            // Mettre à jour visuellement sans snap
+            updateWheelVisual(dragState.columnIndex, floatPosition);
+        }
+
+        function handleDragEnd(e) {
+            if (!dragState.isDragging) return;
+
+            const columnIndex = dragState.columnIndex;
+
+            // Calculer la position finale et snapper à la lettre la plus proche
+            const deltaY = dragState.currentOffset;
+            const steps = Math.round(deltaY / LETTER_HEIGHT);
+
+            currentPositions[columnIndex] = (dragState.startPosition - steps + ALPHABET.length * 10) % ALPHABET.length;
+
+            // Réactiver la transition pour le snap
+            const wheelInner = document.getElementById(`wheel-inner-${columnIndex}`);
+            wheelInner.style.transition = 'transform 0.2s ease-out';
+
+            // Mettre à jour avec snap
+            updateWheel(columnIndex);
+
+            dragState.isDragging = false;
+
+            checkPassword();
+        }
+
+        function rotateWheel(columnIndex, direction) {
+            currentPositions[columnIndex] = (currentPositions[columnIndex] + direction + ALPHABET.length) % ALPHABET.length;
+
+            const wheelInner = document.getElementById(`wheel-inner-${columnIndex}`);
+            wheelInner.style.transition = 'transform 0.3s ease-out';
+
+            updateWheel(columnIndex);
+            checkPassword();
+        }
+
+        function updateWheelVisual(columnIndex, floatPosition) {
+            const wheelInner = document.getElementById(`wheel-inner-${columnIndex}`);
+
+            // Utiliser la position centrale du tableau triplé (ALPHABET.length = offset pour centrer)
+            const visualPosition = floatPosition + ALPHABET.length;
+            const offset = -visualPosition * LETTER_HEIGHT;
+
+            wheelInner.style.transform = `translateY(${offset}px)`;
+
+            // Mettre à jour les couleurs des lettres
+            updateLetterColors(columnIndex, floatPosition);
+        }
+
+        function updateWheel(columnIndex) {
+            const position = currentPositions[columnIndex];
+            updateWheelVisual(columnIndex, position);
+        }
+
+        function updateLetterColors(columnIndex, floatPosition) {
+            const wheelInner = document.getElementById(`wheel-inner-${columnIndex}`);
+            const letters = wheelInner.querySelectorAll('.letter');
+
+            // Position actuelle arrondie
+            const currentPos = Math.round(floatPosition) % ALPHABET.length;
+
+            letters.forEach((letter, index) => {
+                // Index dans le tableau triplé
+                const letterPosInAlphabet = index % ALPHABET.length;
+
+                // Vérifier si c'est la lettre active (en tenant compte du triple)
+                const isActive = (
+                    index === currentPos + ALPHABET.length ||
+                    index === currentPos + ALPHABET.length * 2 ||
+                    index === currentPos
+                );
+
+                if (isActive) {
+                    letter.style.color = '#fff';
+                    letter.style.fontSize = '2.2em';
+                } else {
+                    letter.style.color = '#888';
+                    letter.style.fontSize = '2em';
+                }
+            });
+        }
+
+        function updateAllWheels() {
+            for (let i = 0; i < NUM_COLUMNS; i++) {
+                updateWheel(i);
+            }
+        }
+
+        function checkPassword() {
+            if (isUnlocked) return;
+
+            const currentWord = currentPositions.map(pos => ALPHABET[pos]).join('');
+
+            if (currentWord === CONFIG.password) {
+                isUnlocked = true;
+                setTimeout(() => {
+                    showModal();
+                }, 500);
+            }
+        }
+
+        async function loadModalContent() {
+            const modalBody = document.getElementById('modalBody');
+            const modalTitle = document.querySelector('.modal-header h2');
+
+            // Mettre à jour le titre
+            if (CONFIG.modalTitle) {
+                modalTitle.innerHTML = CONFIG.modalTitle;
+            }
+
+            // Charger le contenu
+            if (CONFIG.modalContentFile) {
+                // Charger depuis un fichier externe
+                try {
+                    const response = await fetch(CONFIG.modalContentFile);
+                    if (response.ok) {
+                        const content = await response.text();
+                        modalBody.innerHTML = content;
+                    } else {
+                        console.error('Erreur lors du chargement du fichier modal:', response.statusText);
+                        modalBody.innerHTML = '<p>Erreur de chargement du contenu.</p>';
+                    }
+                } catch (error) {
+                    console.error('Erreur lors du chargement du fichier modal:', error);
+                    modalBody.innerHTML = '<p>Erreur de chargement du contenu.</p>';
+                }
+            } else if (CONFIG.modalContent) {
+                // Utiliser le contenu inline
+                modalBody.innerHTML = CONFIG.modalContent;
+            }
+        }
+
+        function showModal() {
+            document.getElementById('modal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        // Fermer la modal en cliquant en dehors
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Fermer avec la touche Échap
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Initialisation
+        async function init() {
+            await loadModalContent();
+            createCryptex();
+        }
+
+        init();
+    </script>
+</body>
+</html>

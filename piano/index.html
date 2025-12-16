@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piano - Mini Jeu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .hint {
+            margin-bottom: 30px;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .sequence-display {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .sequence-display p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+
+        .note-bubble {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-size: 1.1em;
+            font-weight: bold;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .piano {
+            position: relative;
+            margin: 0 auto 30px;
+            width: fit-content;
+        }
+
+        .piano-keys {
+            display: flex;
+            position: relative;
+            user-select: none;
+        }
+
+        .key {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .key.white {
+            width: 60px;
+            height: 200px;
+            background: linear-gradient(to bottom, #ffffff 0%, #f0f0f0 100%);
+            border: 2px solid #333;
+            border-radius: 0 0 5px 5px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 15px;
+            font-weight: bold;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .key.white:hover {
+            background: linear-gradient(to bottom, #f0f0f0 0%, #e0e0e0 100%);
+            transform: translateY(-2px);
+        }
+
+        .key.white:active,
+        .key.white.pressed {
+            background: linear-gradient(to bottom, #e0e0e0 0%, #d0d0d0 100%);
+            transform: translateY(2px);
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.2);
+        }
+
+        .key.black {
+            width: 40px;
+            height: 130px;
+            background: linear-gradient(to bottom, #2a2a2a 0%, #000 100%);
+            border: 2px solid #000;
+            border-radius: 0 0 3px 3px;
+            position: absolute;
+            z-index: 2;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+            font-weight: bold;
+            color: #fff;
+            font-size: 0.75em;
+        }
+
+        .key.black:hover {
+            background: linear-gradient(to bottom, #3a3a3a 0%, #1a1a1a 100%);
+        }
+
+        .key.black:active,
+        .key.black.pressed {
+            background: linear-gradient(to bottom, #1a1a1a 0%, #000 100%);
+            box-shadow: inset 0 2px 3px rgba(0,0,0,0.5);
+        }
+
+        /* Position des touches noires */
+        .black-1 { left: 42px; }
+        .black-2 { left: 102px; }
+        .black-3 { left: 222px; }
+        .black-4 { left: 282px; }
+        .black-5 { left: 342px; }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-reset {
+            background: rgba(255, 100, 100, 0.2);
+            border-color: rgba(255, 100, 100, 0.4);
+        }
+
+        .btn-reset:hover {
+            background: rgba(255, 100, 100, 0.3);
+            border-color: rgba(255, 100, 100, 0.6);
+        }
+
+        .btn-validate {
+            background: rgba(0, 255, 100, 0.2);
+            border-color: rgba(0, 255, 100, 0.4);
+        }
+
+        .btn-validate:hover {
+            background: rgba(0, 255, 100, 0.3);
+            border-color: rgba(0, 255, 100, 0.6);
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 3px solid #00ff00;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideDown 0.5s ease-out;
+            box-shadow: 0 0 50px rgba(0, 255, 0, 0.5);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            color: #00ff00;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .modal-body {
+            color: #fff;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .modal-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .modal-body video {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .modal-body iframe {
+            width: 100%;
+            height: 315px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2em;
+            color: #fff;
+            cursor: pointer;
+            background: none;
+            border: none;
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            opacity: 1;
+            transform: scale(1.2);
+            color: #00ff00;
+        }
+
+        @media (max-width: 768px) {
+            .key.white {
+                width: 45px;
+                height: 150px;
+            }
+
+            .key.black {
+                width: 30px;
+                height: 100px;
+            }
+
+            .black-1 { left: 32px; }
+            .black-2 { left: 77px; }
+            .black-3 { left: 167px; }
+            .black-4 { left: 212px; }
+            .black-5 { left: 257px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎹 PIANO</h1>
+        <p class="hint">Jouez la mélodie sur le piano...</p>
+
+        <div class="sequence-display" id="sequenceDisplay">
+            <p>Séquence de déverrouillage : (cliquez sur les touches)</p>
+        </div>
+
+        <div class="piano">
+            <div class="piano-keys">
+                <!-- Touches blanches -->
+                <div class="key white" data-note="Do">Do</div>
+                <div class="key white" data-note="Ré">Ré</div>
+                <div class="key white" data-note="Mi">Mi</div>
+                <div class="key white" data-note="Fa">Fa</div>
+                <div class="key white" data-note="Sol">Sol</div>
+                <div class="key white" data-note="La">La</div>
+                <div class="key white" data-note="Si">Si</div>
+                <div class="key white" data-note="Do2">Do</div>
+
+                <!-- Touches noires -->
+                <div class="key black black-1" data-note="Do#">Do#</div>
+                <div class="key black black-2" data-note="Ré#">Ré#</div>
+                <div class="key black black-3" data-note="Fa#">Fa#</div>
+                <div class="key black black-4" data-note="Sol#">Sol#</div>
+                <div class="key black black-5" data-note="La#">La#</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-reset" onclick="resetSequence()">🔄 Recommencer</button>
+            <button class="btn btn-validate" onclick="validateSequence()">✓ Valider</button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <h2>🎉 DÉVERROUILLÉ ! 🎉</h2>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Le contenu sera chargé depuis CONFIG.modalContent ou CONFIG.modalContentFile -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // CONFIGURATION - Modifiez ces paramètres selon vos besoins
+        // ============================================================
+
+        const CONFIG = {
+            // Mélodie à jouer (première phrase de "Au clair de la lune")
+            correctMelody: ['Do', 'Do', 'Do', 'Ré', 'Mi', 'Ré', 'Do', 'Mi', 'Ré', 'Ré', 'Do'],
+
+            // Titre de la modale
+            modalTitle: '🎉 BRAVO ! 🎉',
+
+            // Contenu de la modale (HTML)
+            modalContent: `
+                <p>Félicitations ! Vous avez joué la mélodie correctement !</p>
+                <p style="margin-top: 20px; font-style: italic; color: rgba(255,255,255,0.8);">
+                    "Au clair de la lune, mon ami Pierrot..."
+                </p>
+            `,
+
+            // Option : Charger depuis un fichier externe
+            // Décommentez la ligne ci-dessous et commentez modalContent pour utiliser un fichier
+            // modalContentFile: 'modal.html',
+
+            // Afficher la solution dans l'indice
+            showHint: false,  // true pour afficher la solution
+
+            // Activer/désactiver le son
+            soundEnabled: true  // false pour désactiver les sons
+        };
+
+        // ============================================================
+        // CODE DU JEU - Ne modifiez pas en dessous sauf si nécessaire
+        // ============================================================
+
+        let currentSequence = [];
+        let isUnlocked = false;
+        let audioContext;
+
+        // Fréquences des notes (en Hz) - Octave 4
+        const noteFrequencies = {
+            'Do': 261.63,   // C4
+            'Do#': 277.18,  // C#4
+            'Ré': 293.66,   // D4
+            'Ré#': 311.13,  // D#4
+            'Mi': 329.63,   // E4
+            'Fa': 349.23,   // F4
+            'Fa#': 369.99,  // F#4
+            'Sol': 392.00,  // G4
+            'Sol#': 415.30, // G#4
+            'La': 440.00,   // A4
+            'La#': 466.16,  // A#4
+            'Si': 493.88,   // B4
+            'Do2': 523.25   // C5
+        };
+
+        // Initialiser le contexte audio
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Jouer un son de piano amélioré avec Web Audio API
+        // Utilise plusieurs oscillateurs pour un son plus riche
+        function playSound(note) {
+            if (!CONFIG.soundEnabled) return;
+
+            initAudio();
+
+            const frequency = noteFrequencies[note];
+            if (!frequency) return;
+
+            const now = audioContext.currentTime;
+            const duration = 1.2;
+
+            // Créer plusieurs oscillateurs pour un son plus riche (harmoniques)
+            const oscillators = [];
+            const gains = [];
+
+            // Oscillateur principal (fondamentale)
+            const osc1 = audioContext.createOscillator();
+            const gain1 = audioContext.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(frequency, now);
+
+            // Harmonique 2 (octave supérieure, plus faible)
+            const osc2 = audioContext.createOscillator();
+            const gain2 = audioContext.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(frequency * 2, now);
+
+            // Harmonique 3 (quinte, encore plus faible)
+            const osc3 = audioContext.createOscillator();
+            const gain3 = audioContext.createGain();
+            osc3.type = 'triangle';
+            osc3.frequency.setValueAtTime(frequency * 3, now);
+
+            // Enveloppe ADSR pour chaque oscillateur (Attack, Decay, Sustain, Release)
+            // Oscillateur principal
+            gain1.gain.setValueAtTime(0, now);
+            gain1.gain.linearRampToValueAtTime(0.3, now + 0.005);   // Attack très rapide
+            gain1.gain.exponentialRampToValueAtTime(0.2, now + 0.1); // Decay
+            gain1.gain.exponentialRampToValueAtTime(0.05, now + 0.8); // Sustain
+            gain1.gain.linearRampToValueAtTime(0.001, now + duration); // Release
+
+            // Harmonique 2 (plus subtile)
+            gain2.gain.setValueAtTime(0, now);
+            gain2.gain.linearRampToValueAtTime(0.15, now + 0.005);
+            gain2.gain.exponentialRampToValueAtTime(0.1, now + 0.1);
+            gain2.gain.exponentialRampToValueAtTime(0.02, now + 0.6);
+            gain2.gain.linearRampToValueAtTime(0.001, now + duration);
+
+            // Harmonique 3 (très subtile)
+            gain3.gain.setValueAtTime(0, now);
+            gain3.gain.linearRampToValueAtTime(0.08, now + 0.005);
+            gain3.gain.exponentialRampToValueAtTime(0.04, now + 0.08);
+            gain3.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+            gain3.gain.linearRampToValueAtTime(0.001, now + duration);
+
+            // Connecter les oscillateurs
+            osc1.connect(gain1);
+            gain1.connect(audioContext.destination);
+
+            osc2.connect(gain2);
+            gain2.connect(audioContext.destination);
+
+            osc3.connect(gain3);
+            gain3.connect(audioContext.destination);
+
+            // Démarrer et arrêter les oscillateurs
+            osc1.start(now);
+            osc1.stop(now + duration);
+
+            osc2.start(now);
+            osc2.stop(now + duration);
+
+            osc3.start(now);
+            osc3.stop(now + duration);
+        }
+
+        // ============================================================
+        // NOTES SUR L'AUDIO - VERSION HORS LIGNE
+        // ============================================================
+        //
+        // Cette version utilise Web Audio API avec synthèse multi-oscillateurs
+        // pour créer des sons de piano plus riches et réalistes.
+        //
+        // ✅ Avantages :
+        // - Fonctionne 100% HORS LIGNE (aucune connexion Internet requise)
+        // - Aucun fichier externe à télécharger
+        // - Léger (0 Ko de données)
+        // - Self-contained (tout dans un seul fichier HTML)
+        // - Sons générés en temps réel avec harmoniques
+        //
+        // Technique :
+        // - 3 oscillateurs par note (fondamentale + harmoniques)
+        // - Enveloppe ADSR personnalisée pour chaque harmonique
+        // - Son plus riche qu'un simple oscillateur
+        //
+        // ALTERNATIVE : Pour des sons de VRAI piano (nécessite fichiers locaux)
+        // Si vous préférez utiliser des échantillons MP3 de vrai piano :
+        //
+        // 1. Téléchargez les sons pour les notes suivantes :
+        //    Do.mp3, Do#.mp3, Ré.mp3, Ré#.mp3, Mi.mp3, Fa.mp3, Fa#.mp3,
+        //    Sol.mp3, Sol#.mp3, La.mp3, La#.mp3, Si.mp3, Do2.mp3
+        //
+        // 2. Créez un dossier "sounds/" et placez-y les fichiers MP3
+        //
+        // 3. Décommentez le code ci-dessous et commentez la fonction playSound() ci-dessus
+        //
+        /*
+        const audioFiles = {};
+
+        function preloadAudioFiles() {
+            const notes = ['Do', 'Do#', 'Ré', 'Ré#', 'Mi', 'Fa', 'Fa#', 'Sol', 'Sol#', 'La', 'La#', 'Si', 'Do2'];
+            notes.forEach(note => {
+                audioFiles[note] = new Audio(`sounds/${note}.mp3`);
+                audioFiles[note].preload = 'auto';
+                audioFiles[note].volume = 0.5;
+            });
+        }
+
+        function playSound(note) {
+            if (!CONFIG.soundEnabled) return;
+            if (audioFiles[note]) {
+                const audio = audioFiles[note].cloneNode();
+                audio.play().catch(e => console.log('Audio play failed:', e));
+            }
+        }
+
+        // Puis dans la fonction init(), ajoutez :
+        // preloadAudioFiles();
+        */
+
+        // Initialiser les événements sur les touches
+        function initPiano() {
+            const keys = document.querySelectorAll('.key');
+
+            keys.forEach(key => {
+                key.addEventListener('click', () => playNote(key));
+
+                // Support clavier (optionnel)
+                key.addEventListener('mousedown', () => key.classList.add('pressed'));
+                key.addEventListener('mouseup', () => key.classList.remove('pressed'));
+                key.addEventListener('mouseleave', () => key.classList.remove('pressed'));
+
+                // Support tactile
+                key.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    key.classList.add('pressed');
+                    playNote(key);
+                });
+                key.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    key.classList.remove('pressed');
+                });
+            });
+        }
+
+        function playNote(keyElement) {
+            const note = keyElement.dataset.note;
+
+            // Jouer le son de la note
+            playSound(note);
+
+            if (isUnlocked) return;
+
+            // Ajouter la note à la séquence
+            currentSequence.push(note);
+
+            // Effet visuel sur la touche
+            keyElement.classList.add('pressed');
+            setTimeout(() => {
+                keyElement.classList.remove('pressed');
+            }, 200);
+
+            // Mettre à jour l'affichage
+            updateDisplay();
+
+            // Vérifier automatiquement si la séquence est trop longue
+            if (currentSequence.length >= CONFIG.correctMelody.length) {
+                setTimeout(validateSequence, 300);
+            }
+        }
+
+        function updateDisplay() {
+            const display = document.getElementById('sequenceDisplay');
+
+            if (currentSequence.length === 0) {
+                display.innerHTML = '<p>Séquence de déverrouillage : (cliquez sur les touches)</p>';
+            } else {
+                display.innerHTML = '';
+                currentSequence.forEach(note => {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'note-bubble';
+                    bubble.textContent = note;
+                    display.appendChild(bubble);
+                });
+            }
+        }
+
+        function resetSequence() {
+            currentSequence = [];
+            updateDisplay();
+
+            // Retirer l'animation shake si présente
+            const display = document.getElementById('sequenceDisplay');
+            display.classList.remove('shake');
+        }
+
+        function validateSequence() {
+            if (isUnlocked) return;
+
+            const display = document.getElementById('sequenceDisplay');
+
+            // Vérifier si la séquence est correcte
+            if (currentSequence.length === CONFIG.correctMelody.length &&
+                currentSequence.every((note, index) => note === CONFIG.correctMelody[index])) {
+
+                // Succès !
+                isUnlocked = true;
+                setTimeout(() => {
+                    showModal();
+                }, 500);
+
+            } else {
+                // Erreur - animation shake
+                display.classList.add('shake');
+                setTimeout(() => {
+                    display.classList.remove('shake');
+                    resetSequence();
+                }, 500);
+            }
+        }
+
+        async function loadModalContent() {
+            const modalBody = document.getElementById('modalBody');
+            const modalTitle = document.querySelector('.modal-header h2');
+
+            // Mettre à jour le titre
+            if (CONFIG.modalTitle) {
+                modalTitle.innerHTML = CONFIG.modalTitle;
+            }
+
+            // Charger le contenu
+            if (CONFIG.modalContentFile) {
+                try {
+                    const response = await fetch(CONFIG.modalContentFile);
+                    if (response.ok) {
+                        const content = await response.text();
+                        modalBody.innerHTML = content;
+                    } else {
+                        console.error('Erreur lors du chargement du fichier modal:', response.statusText);
+                        modalBody.innerHTML = '<p>Erreur de chargement du contenu.</p>';
+                    }
+                } catch (error) {
+                    console.error('Erreur lors du chargement du fichier modal:', error);
+                    modalBody.innerHTML = '<p>Erreur de chargement du contenu.</p>';
+                }
+            } else if (CONFIG.modalContent) {
+                modalBody.innerHTML = CONFIG.modalContent;
+            }
+        }
+
+        function showModal() {
+            document.getElementById('modal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        // Fermer la modal en cliquant en dehors
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Fermer avec la touche Échap
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Afficher l'indice si configuré
+        if (CONFIG.showHint) {
+            document.querySelector('.hint').textContent =
+                `Jouez : ${CONFIG.correctMelody.join(' - ')}`;
+        }
+
+        // Initialisation
+        async function init() {
+            await loadModalContent();
+            initPiano();
+        }
+
+        init();
+    </script>
+</body>
+</html>

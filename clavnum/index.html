@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clavier Numérique - Mini Jeu</title>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Base styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+        }
+
+        .container {
+            background: rgba(40, 40, 60, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 450px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        /* Display area */
+        .display {
+            background: rgba(30, 30, 40, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            min-height: 60px;
+            text-align: center;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .display-content {
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            font-family: 'Courier New', monospace;
+        }
+
+        .display-placeholder {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 18px;
+            font-style: italic;
+        }
+
+        /* Keypad grid */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .key {
+            padding: 25px;
+            border: none;
+            border-radius: 15px;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: linear-gradient(135deg, #3498db, #2874a6);
+            color: #fff;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .key:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.5),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .key:active {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .key.pressed {
+            transform: scale(0.95);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+        }
+
+        .key.zero {
+            grid-column: 2;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .control-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+        }
+
+        .validate-btn {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            display: none;
+        }
+
+        .message.error {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            display: block;
+        }
+
+        /* Animations */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes unlock {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05) rotate(2deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .unlock {
+            animation: unlock 0.6s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.3);
+            animation: slideIn 0.5s ease;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 35px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            transform: rotate(90deg);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 32px;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+            color: #00ffff;
+        }
+
+        .modal-body {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.8;
+        }
+
+        .modal-body p {
+            margin-bottom: 15px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .key {
+                padding: 20px;
+                font-size: 28px;
+            }
+
+            .display-content {
+                font-size: 24px;
+                letter-spacing: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Code de déverrouillage :</h1>
+
+        <div class="display">
+            <div class="display-content" id="display">
+                <span class="display-placeholder">Entrez le code</span>
+            </div>
+        </div>
+
+        <div class="keypad">
+            <button class="key" data-number="7">7</button>
+            <button class="key" data-number="8">8</button>
+            <button class="key" data-number="9">9</button>
+            <button class="key" data-number="4">4</button>
+            <button class="key" data-number="5">5</button>
+            <button class="key" data-number="6">6</button>
+            <button class="key" data-number="1">1</button>
+            <button class="key" data-number="2">2</button>
+            <button class="key" data-number="3">3</button>
+            <button class="key zero" data-number="0">0</button>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn reset-btn" id="resetBtn">
+                <span style="font-size: 24px;">↺</span>
+                Réinitialiser
+            </button>
+            <button class="control-btn validate-btn" id="validateBtn">
+                <span style="font-size: 24px;">✓</span>
+                Valider
+            </button>
+        </div>
+
+        <div class="message" id="message"></div>
+    </div>
+
+    <!-- Modal de succès -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalTitle">🎉 DÉVERROUILLÉ ! 🎉</h2>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const CONFIG = {
+            // Le code numérique correct (facile à modifier!)
+            correctCode: '0809',
+
+            // Longueur maximale du code (pour limiter la saisie)
+            maxLength: 6,
+
+            // Affichage masqué (true = affiche des •, false = affiche les chiffres)
+            hideCode: false,
+
+            // Titre et contenu du modal de succès
+            modalTitle: '🎉 DÉVERROUILLÉ ! 🎉',
+            modalContent: `
+                <p style="text-align: center; font-size: 18px;">
+                    <strong>Félicitations!</strong> Vous avez trouvé le bon code!
+                </p>
+                <p style="text-align: center;">
+                    Le cadenas est maintenant déverrouillé.
+                </p>
+            `,
+            // Décommentez la ligne ci-dessous pour charger le contenu depuis un fichier externe:
+            // modalContentFile: 'modal.html',
+        };
+
+        // ============================================
+        // GAME CODE
+        // ============================================
+        let currentCode = '';
+
+        const keys = document.querySelectorAll('.key');
+        const display = document.getElementById('display');
+        const resetBtn = document.getElementById('resetBtn');
+        const validateBtn = document.getElementById('validateBtn');
+        const messageDiv = document.getElementById('message');
+        const container = document.querySelector('.container');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+
+        // ============================================
+        // MODAL FUNCTIONS
+        // ============================================
+        async function loadModalContent() {
+            if (CONFIG.modalContentFile) {
+                try {
+                    const response = await fetch(CONFIG.modalContentFile);
+                    const content = await response.text();
+                    modalBody.innerHTML = content;
+                } catch (error) {
+                    console.warn('Impossible de charger le fichier modal, utilisation du contenu par défaut');
+                    modalBody.innerHTML = CONFIG.modalContent;
+                }
+            } else {
+                modalBody.innerHTML = CONFIG.modalContent;
+            }
+            modalTitle.textContent = CONFIG.modalTitle;
+        }
+
+        function showModal() {
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        // Fermer le modal en cliquant en dehors
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Fermer le modal avec la touche ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // ============================================
+        // GAME FUNCTIONS
+        // ============================================
+        function updateDisplay() {
+            if (currentCode.length === 0) {
+                display.innerHTML = '<span class="display-placeholder">Entrez le code</span>';
+            } else {
+                const displayText = CONFIG.hideCode ? '•'.repeat(currentCode.length) : currentCode;
+                display.innerHTML = displayText;
+            }
+        }
+
+        function addDigit(digit) {
+            if (currentCode.length < CONFIG.maxLength) {
+                currentCode += digit;
+                updateDisplay();
+            }
+        }
+
+        function resetCode() {
+            currentCode = '';
+            updateDisplay();
+            messageDiv.style.display = 'none';
+            messageDiv.className = 'message';
+        }
+
+        function validateCode() {
+            if (currentCode.length === 0) {
+                showMessage('Veuillez entrer un code.', 'error');
+                return;
+            }
+
+            if (currentCode === CONFIG.correctCode) {
+                container.classList.add('unlock');
+                setTimeout(() => {
+                    container.classList.remove('unlock');
+                    showModal();
+                }, 600);
+            } else {
+                showMessage('❌ Code incorrect. Réessayez!', 'error');
+                container.classList.add('shake');
+                setTimeout(() => container.classList.remove('shake'), 500);
+            }
+        }
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        keys.forEach(key => {
+            key.addEventListener('click', () => {
+                const digit = key.dataset.number;
+                addDigit(digit);
+
+                key.classList.add('pressed');
+                setTimeout(() => key.classList.remove('pressed'), 200);
+            });
+        });
+
+        resetBtn.addEventListener('click', resetCode);
+        validateBtn.addEventListener('click', validateCode);
+
+        // Support clavier physique
+        document.addEventListener('keydown', (e) => {
+            if (modal.classList.contains('active')) return;
+
+            if (e.key >= '0' && e.key <= '9') {
+                addDigit(e.key);
+
+                // Animation visuelle de la touche
+                const keyElement = document.querySelector(`[data-number="${e.key}"]`);
+                if (keyElement) {
+                    keyElement.classList.add('pressed');
+                    setTimeout(() => keyElement.classList.remove('pressed'), 200);
+                }
+            } else if (e.key === 'Enter') {
+                validateCode();
+            } else if (e.key === 'Backspace') {
+                currentCode = currentCode.slice(0, -1);
+                updateDisplay();
+            } else if (e.key === 'Escape') {
+                resetCode();
+            }
+        });
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        async function init() {
+            await loadModalContent();
+            updateDisplay();
+        }
+
+        init();
+    </script>
+</body>
+</html>
